@@ -1,5 +1,10 @@
+#paths to the root folder with all .npy files, as well as the csv with Filename, and label.
 root = '/path/to/npy/files/root'
 test_csv = '/path/to/filename/and/labels/csv'
+
+#feel free to adjust
+num_dataloader_workers = 8
+batch_size = 1000
 
 #name of the column in test_csv where the boolean label for CKD (True)/No CKD (False) is stored
 target='label'
@@ -14,11 +19,6 @@ import matplotlib.pyplot as plt
 from ECG import EchoECG
 from tqdm import tqdm
 import sklearn
-
-root = '/workspace/data/drives/Local_SSD/sdd/data/Remade with New Coefficents'
-test_csv = '/workspace/data/drives/Local_SSD/sdc/kidney_disease/DefinitiveAllStagesData/under_60_years_old_subset_test.csv'
-target='label'
-base = '/workspace/kai/ckd-cross-validation/Training/'
 
 def test_model(one_lead=False):
     torch.cuda.empty_cache()
@@ -47,9 +47,8 @@ def test_model(one_lead=False):
                       return_filename=False)
     
     test_dataloader = torch.utils.data.DataLoader(test_ds,
-                                                batch_size=2000, 
-                                                num_workers=8, #Feel free to increase this depending 
-                                                               #on your machine's specs to speed up inference
+                                                batch_size=batch_size, 
+                                                num_workers=num_dataloader_workers,
                                                 drop_last=False)
 
     all_labels = []
@@ -65,10 +64,16 @@ def test_model(one_lead=False):
 
 one_labels, one_preds = test_model(one_lead=True)
 fpr, tpr, thresholds = sklearn.metrics.roc_curve(one_labels, one_preds)
+print(' ')
 print('One-Lead Model')
 print(sklearn.metrics.auc(fpr, tpr))
 
 twelve_labels, twelve_preds = test_model(one_lead=False)
 fpr, tpr, thresholds = sklearn.metrics.roc_curve(twelve_labels, twelve_preds)
+print(' ')
 print('Twelve-Lead Model')
 print(sklearn.metrics.auc(fpr, tpr))
+
+results = pd.DataFrame({'one_lead_predictions':one_preds, 'one_lead_labels':one_labels, 
+                       'twelve_lead_predictions':twelve_preds, 'twelve_lead_labels':twelve_labels})
+results.to_csv('results.csv')

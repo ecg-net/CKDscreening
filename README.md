@@ -19,9 +19,9 @@ Testing repo to allow for external validation of Cedars-Sinai research into usin
     * "age", age of patient in years at time of EKG.
 * Testing notebook has variables at the top for a root path to the folder containing all .npy files as well as one for the path to the testing CSV.
 * Model outputs a prediction between 0 and 1 representing whether or not it predicts the patient has the diagnosis within the window.
-* Testing speed should be in the ballpark of ~800 examples per second
+* Testing speed should be in the rough ballpark of ~800 examples per second
 * Model weights are already in repo and referenced relatively.
 
 ## Testing Procedure
 * Install requirements.txt
-* Open TestingClassifier.ipynb, edit and run all cells. AUC values will be printed at the bottom of the notebook.
+* Open test_classifiers.py and add paths to names/labels CSV as well as and folder containing waveforms, then run the script. Results are outputted to results.csv that you can send back over to me so I can run downstream analysis.
